@@ -9,20 +9,26 @@ import { siteContent } from "@/content/siteContent";
 
 const manrope = Manrope({ subsets: ["latin"], variable: "--font-manrope" });
 const playfair = Playfair_Display({ subsets: ["latin"], variable: "--font-playfair" });
+const normalizedDomain = (() => {
+  const trimmed = siteContent.domain.trim();
+  const withProtocol = /^https?:\/\//i.test(trimmed) ? trimmed : `https://${trimmed}`;
+  return withProtocol.replace(/\/+$/, "");
+})();
 
 export const metadata: Metadata = {
-  metadataBase: new URL(siteContent.domain),
+  metadataBase: new URL(normalizedDomain),
   title: "HWK Sanierung | Sanierung, Modernisierung & Schadensanierung",
   description:
     "HWK Sanierung ist Ihr spezialisierter Generalunternehmer für Sanierung, Modernisierung, Revitalisierung sowie Brand- und Wasserschadensanierung – deutschlandweit, strukturiert und zuverlässig.",
+  manifest: "/site.webmanifest",
   alternates: {
-    canonical: siteContent.domain,
+    canonical: new URL(normalizedDomain),
   },
   openGraph: {
     title: "HWK Sanierung | Sanierung, Modernisierung & Schadensanierung",
     description:
       "Ganzheitliche Sanierungslösungen, digitales Baumanagement und schlüsselfertige Übergaben – HWK Sanierung.",
-    url: siteContent.domain,
+    url: normalizedDomain,
     siteName: siteContent.company,
     locale: "de_DE",
     type: "website",
@@ -31,6 +37,16 @@ export const metadata: Metadata = {
     index: true,
     follow: true,
   },
+  icons: {
+    icon: [
+      "/favicon.ico",
+      { url: "/favicon.svg", type: "image/svg+xml" },
+      { url: "/favicon-96x96.png", type: "image/png", sizes: "96x96" },
+    ],
+    shortcut: "/favicon.ico",
+    apple: "/apple-touch-icon.png",
+  },
+  themeColor: "#ffffff",
 };
 
 export default function RootLayout({
@@ -41,8 +57,9 @@ export default function RootLayout({
   const jsonLd = {
     "@context": "https://schema.org",
     "@type": "LocalBusiness",
+    "@id": `${normalizedDomain}/#localbusiness`,
     name: siteContent.company,
-    url: siteContent.domain,
+    url: normalizedDomain,
     telephone: siteContent.phoneRaw,
     email: siteContent.email,
     address: {
@@ -53,7 +70,7 @@ export default function RootLayout({
       addressCountry: "DE",
     },
     areaServed: "DE",
-    image: `${siteContent.domain}/assets/logo.png`,
+    image: `${normalizedDomain}/assets/logo.png`,
   };
 
   return (
